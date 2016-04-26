@@ -57,6 +57,12 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OrderEntryMockingPractice\OrderEntryMockingPractice.csproj">
+      <Project>{a78c2428-31a6-4627-b5dc-7791d06ef423}</Project>
+      <Name>OrderEntryMockingPractice</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

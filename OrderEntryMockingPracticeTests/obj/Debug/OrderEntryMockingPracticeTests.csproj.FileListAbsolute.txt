@@ -8,3 +8,5 @@ C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\NSubst
 C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\nunit.framework.dll
 C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\NSubstitute.xml
 C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\nunit.framework.xml
+C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\OrderEntryMockingPractice.dll
+C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\OrderEntryMockingPractice.pdb
