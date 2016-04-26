@@ -10,3 +10,5 @@ C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\NSubst
 C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\nunit.framework.xml
 C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\OrderEntryMockingPractice.dll
 C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\OrderEntryMockingPractice.pdb
+C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\Shouldly.dll
+C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\Shouldly.pdb
