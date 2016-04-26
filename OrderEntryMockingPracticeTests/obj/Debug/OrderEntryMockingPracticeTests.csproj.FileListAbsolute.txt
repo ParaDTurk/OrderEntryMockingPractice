@@ -3,3 +3,8 @@ C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\OrderE
 C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\obj\Debug\OrderEntryMockingPracticeTests.csprojResolveAssemblyReference.cache
 C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\obj\Debug\OrderEntryMockingPracticeTests.dll
 C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\obj\Debug\OrderEntryMockingPracticeTests.pdb
+C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\FizzWare.NBuilder.dll
+C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\NSubstitute.dll
+C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\nunit.framework.dll
+C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\NSubstitute.xml
+C:\src\OrderEntryMockingPractice\OrderEntryMockingPracticeTests\bin\Debug\nunit.framework.xml
