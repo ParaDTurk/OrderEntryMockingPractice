@@ -54,7 +54,7 @@ namespace OrderEntryMockingPracticeTests
             _taxEntry = new TaxEntry()
             {
                 Description = "Crazu",
-                Rate = (decimal) 0.20
+                Rate = 1.0m
             };
 
             _customer = new Customer
@@ -152,6 +152,58 @@ namespace OrderEntryMockingPracticeTests
 
             //Act & Assert
             Should.Throw<InvalidOperationException>(() => _orderService.PlaceOrder(order));
+        }
+
+        [Test]
+        public void PlacedOrderIsSubmittedToOrderFullfillmentService()
+        {
+            //Arrange
+            var order = CreateValidOrder();
+
+            //Act
+            var placedOrder = _orderService.PlaceOrder(order);
+
+            //Assert
+            _orderFulfillmentService.Received().Fulfill(order);
+        }
+
+        [Test]
+        public void PlacedOrderSummaryContainsFullfillmentConfirmationNumber()
+        {
+            //Arrange
+            var order = CreateValidOrder();
+
+            //Assert
+            var placedOrderSummary = _orderService.PlaceOrder(order);
+
+            //Act
+            placedOrderSummary.OrderNumber.ShouldNotBeNull();
+        }
+
+        [Test]
+        public void PlacedOrderSummaryContainsId()
+        {
+            //Arrange
+            var order = CreateValidOrder();
+
+            //Assert
+            var placedOrderSummary = _orderService.PlaceOrder(order);
+
+            //Act
+            placedOrderSummary.OrderId.ShouldNotBeNull();
+        }
+
+        [Test]
+        public void PlacedOrderSummaryContainsTaxes()
+        {
+            //Arrange
+            var order = CreateValidOrder();
+
+            //Assert
+            var placedOrderSummary = _orderService.PlaceOrder(order);
+
+            //Act
+            placedOrderSummary.Taxes.ShouldNotBeNull();
         }
     }
 }

@@ -28,7 +28,13 @@ namespace OrderEntryMockingPractice.Services
         {
             ValidateOrder(order);
 
-            OrderSummary orderSummary = new OrderSummary();
+            var fulfilledOrder = _orderFulfillmentService.Fulfill(order);
+            
+            OrderSummary orderSummary = new OrderSummary()
+            {
+                OrderNumber = fulfilledOrder.OrderNumber,
+                OrderId = fulfilledOrder.OrderId
+            };
 
             return orderSummary;
         }
