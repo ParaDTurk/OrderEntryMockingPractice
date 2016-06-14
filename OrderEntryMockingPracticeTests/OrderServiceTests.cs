@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security;
 using NUnit;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
 using Shouldly;
@@ -21,7 +22,6 @@ namespace OrderEntryMockingPracticeTests
         private IProductRepository _productRepository;
         private ITaxRateService _taxRateService;
 
-        private Order _order;
         private OrderService _orderService;
         private OrderConfirmation _orderConfirmation;
         private TaxEntry _taxEntry;
@@ -85,24 +85,37 @@ namespace OrderEntryMockingPracticeTests
                 Quantity = 1m
             };
 
-            _order = new Order
+            
+        }
+
+        public Order CreateValidOrder()
+        {
+            var order = new Order
             {
                 CustomerId = 11,
                 OrderItems = new List<OrderItem>()
             };
 
-            _order.OrderItems.Add(_orderItem1);
-            _order.OrderItems.Add(_orderItem2);
-        }
+            order.OrderItems.Add(_orderItem1);
+            order.OrderItems.Add(_orderItem2);
 
-        public Order CreateValidOrder()
-        {
-            _orderFulfillmentService.Fulfill(_order).Returns(_orderConfirmation);
+            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
             _taxRateService.GetTaxEntries(Arg.Any<String>(), Arg.Any<String>()).Returns(new[] {_taxEntry});
-            _orderFulfillmentService.Fulfill(_order).Returns(_orderConfirmation);
+            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
             _productRepository.IsInStock(Arg.Any<String>()).Returns(true);
 
-            return _order;
+            return order;
+        }
+
+        public Order CreateOrder()
+        {
+            var order = new Order
+            {
+                CustomerId = 11,
+                OrderItems = new List<OrderItem>()
+            };
+
+            return order;
         }
 
         [Test]
@@ -116,6 +129,29 @@ namespace OrderEntryMockingPracticeTests
 
             //Assert
             placedOrder.ShouldBeOfType<OrderSummary>();
+        }
+
+        [Test]
+        public void PlaceOrderWithDupeSKUThrowsException()
+        {
+            //Arrange
+            var order = CreateOrder();
+            order.OrderItems.Add(_orderItem1);
+            order.OrderItems.Add(_orderItem1);
+
+            //Act & Assert
+            Should.Throw<InvalidOperationException>(() =>_orderService.PlaceOrder(order));
+        }
+
+        [Test]
+        public void PlaceOrderWithItemsOutOfStockThrowsException()
+        {
+            //Arrange
+            var order = CreateValidOrder();
+            _productRepository.IsInStock(_orderItem2.Product.Sku).Returns(false);
+
+            //Act & Assert
+            Should.Throw<InvalidOperationException>(() => _orderService.PlaceOrder(order));
         }
     }
 }
