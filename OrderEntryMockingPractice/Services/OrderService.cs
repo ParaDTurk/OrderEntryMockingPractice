@@ -25,7 +25,8 @@ namespace OrderEntryMockingPractice.Services
 
         public OrderSummary PlaceOrder(Order order)
         {
-            return null;
+            OrderSummary orderSummary = new OrderSummary();
+            return orderSummary;
         }
     }
 }

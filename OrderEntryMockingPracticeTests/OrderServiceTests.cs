@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using NUnit;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
 using Shouldly;
 using OrderEntryMockingPractice.Models;
@@ -13,80 +15,107 @@ namespace OrderEntryMockingPracticeTests
     [TestFixture]
     public class OrderServiceTests
     {
-        private ICustomerRepository _fakeCustomerRepository;
-        private IEmailService _fakeEmailService;
-        private IOrderFulfillmentService _fakeOrderFulfillmentService;
-        private IProductRepository _fakeProductRepository;
-        private ITaxRateService _fakeTaxRateService;
+        private ICustomerRepository _customerRepository;
+        private IEmailService _emailService;
+        private IOrderFulfillmentService _orderFulfillmentService;
+        private IProductRepository _productRepository;
+        private ITaxRateService _taxRateService;
+
+        private Order _order;
         private OrderService _orderService;
-        private OrderItem _fakeItem1;
-        private Order _fakeOrder1;
-        private Customer _fakeCustomer;
-        private TaxEntry _fakeTaxEntry;
+        private OrderConfirmation _orderConfirmation;
+        private TaxEntry _taxEntry;
+        private Customer _customer;
+        private OrderItem _orderItem1;
+        private OrderItem _orderItem2;
 
         [SetUp]
         public void SetUp()
         {
-            _fakeCustomerRepository = Substitute.For<ICustomerRepository>();
-            _fakeEmailService = Substitute.For<IEmailService>();
-            _fakeOrderFulfillmentService = Substitute.For<IOrderFulfillmentService>();
-            _fakeProductRepository = Substitute.For<IProductRepository>();
-            _fakeTaxRateService = Substitute.For<ITaxRateService>();
+            _customerRepository = Substitute.For<ICustomerRepository>();
+            _emailService = Substitute.For<IEmailService>();
+            _orderFulfillmentService = Substitute.For<IOrderFulfillmentService>();
+            _productRepository = Substitute.For<IProductRepository>();
+            _taxRateService = Substitute.For<ITaxRateService>();
 
-            _orderService = new OrderService(_fakeCustomerRepository, 
-                                             _fakeEmailService, 
-                                             _fakeOrderFulfillmentService, 
-                                             _fakeProductRepository, 
-                                             _fakeTaxRateService);
+            _orderService = new OrderService(   _customerRepository, 
+                                                _emailService, 
+                                                _orderFulfillmentService, 
+                                                _productRepository, 
+                                                _taxRateService);
 
-            _fakeItem1 = new OrderItem
-            {
-                Product = new Product
-                {
-                    Price = 10.00m,
-                    Sku = "fakeItem1"
-                },
-                Quantity = 1
+            _orderConfirmation = new OrderConfirmation
+            {   
+                CustomerId = 11,
+                OrderId = 11,
+                OrderNumber = "Eleven"
             };
 
-            _fakeOrder1 = new Order
+            _taxEntry = new TaxEntry()
             {
-                CustomerId = 1,
+                Description = "Crazu",
+                Rate = (decimal) 0.20
+            };
+
+            _customer = new Customer
+            {
+                CustomerId = 11,
+                CustomerName = "Bob",
+                PostalCode = "90210",
+                Country = "USA"
+            };
+
+            _orderItem1 = new OrderItem()
+            {
+                Product = new Product()
+                {
+                    Price = 100m,
+                    Sku = "123"
+                },
+                Quantity = 1m
+            };
+
+            _orderItem2 = new OrderItem()
+            {
+                Product = new Product()
+                {
+                    Price = 100m,
+                    Sku = "456"
+                },
+                Quantity = 1m
+            };
+
+            _order = new Order
+            {
+                CustomerId = 11,
                 OrderItems = new List<OrderItem>()
             };
 
-            _fakeCustomer = new Customer()
-            {
-                CustomerId = 1,
-                CustomerName = "fake",
-                City = "Seattle",
-                StateOrProvince = "WA",
-                Country = "USA",
-                PostalCode = "90101"
-            };
-
-            _fakeTaxEntry = new TaxEntry
-            {
-                Description = "fakeTaxEntry1",
-                Rate = 3.0m
-            };
-
-            _fakeOrder1.OrderItems.Add(_fakeItem1);
+            _order.OrderItems.Add(_orderItem1);
+            _order.OrderItems.Add(_orderItem2);
         }
 
-        public OrderSummary PlaceOrder()
+        public Order CreateValidOrder()
         {
-            _fakeCustomerRepository.Get(1).Returns(_fakeCustomer);
+            _orderFulfillmentService.Fulfill(_order).Returns(_orderConfirmation);
+            _taxRateService.GetTaxEntries(Arg.Any<String>(), Arg.Any<String>()).Returns(new[] {_taxEntry});
+            _orderFulfillmentService.Fulfill(_order).Returns(_orderConfirmation);
+            _productRepository.IsInStock(Arg.Any<String>()).Returns(true);
 
-            return _orderService.PlaceOrder(_fakeOrder1);
+            return _order;
         }
 
         [Test]
-        public void TestTest()
+        public void PlacedValidOrderReturnsOrderSummary()
         {
-            int test = 10;
+            //Arrange
+            var order = CreateValidOrder();
 
-            test.ShouldBe(10);
+            //Act
+            var placedOrder = _orderService.PlaceOrder(order);
+
+            //Assert
+            placedOrder.ShouldBeOfType<OrderSummary>();
         }
     }
 }
