@@ -5,11 +5,11 @@ namespace OrderEntryMockingPractice.Services
 {
     public class OrderService
     {
-        private ICustomerRepository _customerRepository;
-        private IOrderFulfillmentService _orderFulfillmentService;
-        private IEmailService _emailService;
-        private IProductRepository _productRepository;
-        private ITaxRateService _taxRateService;
+        private readonly ICustomerRepository _customerRepository;
+        private readonly IOrderFulfillmentService _orderFulfillmentService;
+        private readonly IEmailService _emailService;
+        private readonly IProductRepository _productRepository;
+        private readonly ITaxRateService _taxRateService;
 
         public OrderService (ICustomerRepository customerRepository, 
                              IEmailService emailService, 
@@ -29,11 +29,16 @@ namespace OrderEntryMockingPractice.Services
             ValidateOrder(order);
 
             var fulfilledOrder = _orderFulfillmentService.Fulfill(order);
+
+            var customer = _customerRepository.Get(fulfilledOrder.CustomerId);
             
             OrderSummary orderSummary = new OrderSummary()
             {
                 OrderNumber = fulfilledOrder.OrderNumber,
-                OrderId = fulfilledOrder.OrderId
+                OrderId = fulfilledOrder.OrderId,
+                CustomerId = fulfilledOrder.CustomerId,
+                Taxes = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country),
+                NetTotal = CalculateNetTotal(order)
             };
 
             return orderSummary;
@@ -60,6 +65,17 @@ namespace OrderEntryMockingPractice.Services
         private bool SKUsAreUnique(Order order)
         {
             return order.OrderItems.Distinct().Count() == order.OrderItems.Count;
+        }
+
+        private decimal CalculateNetTotal(Order order)
+        {
+            decimal total = 0;
+            foreach (OrderItem orderItem in order.OrderItems)
+            {
+                total = orderItem.Quantity*orderItem.Product.Price;
+            }
+
+            return total;
         }
     }
 }

@@ -103,6 +103,7 @@ namespace OrderEntryMockingPracticeTests
             _taxRateService.GetTaxEntries(Arg.Any<String>(), Arg.Any<String>()).Returns(new[] {_taxEntry});
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
             _productRepository.IsInStock(Arg.Any<String>()).Returns(true);
+            _customerRepository.Get(Arg.Any<int>()).Returns(_customer);
 
             return order;
         }
@@ -177,7 +178,7 @@ namespace OrderEntryMockingPracticeTests
             var placedOrderSummary = _orderService.PlaceOrder(order);
 
             //Act
-            placedOrderSummary.OrderNumber.ShouldNotBeNull();
+            placedOrderSummary.OrderNumber.ShouldBe("Eleven");
         }
 
         [Test]
@@ -190,11 +191,39 @@ namespace OrderEntryMockingPracticeTests
             var placedOrderSummary = _orderService.PlaceOrder(order);
 
             //Act
-            placedOrderSummary.OrderId.ShouldNotBeNull();
+            placedOrderSummary.OrderId.ShouldBe(11);
         }
 
         [Test]
-        public void PlacedOrderSummaryContainsTaxes()
+        public void PlacedOrderSummaryContainsTaxesFromTaxRateService()
+        {
+            //Arrange
+            var order = CreateValidOrder();
+        
+            //Assert
+            var placedOrderSummary = _orderService.PlaceOrder(order);
+        
+            //Act
+            _taxRateService.Received().GetTaxEntries("90210", "USA");
+            placedOrderSummary.Taxes.ShouldBe(new []{_taxEntry});
+        }
+
+        [Test]
+        public void PlacedOrderGetsCustomerInfoFromCustomerRepository()
+        {
+            //Arrange
+            var order = CreateValidOrder();
+
+            //Assert
+            var placedOrder = _orderService.PlaceOrder(order);
+
+            //Act
+            _customerRepository.Received().Get(Arg.Any<int>());
+            placedOrder.CustomerId.ShouldBe(11);
+        }
+
+        [Test]
+        public void PlacedOrderSummaryContainsNetTotal()
         {
             //Arrange
             var order = CreateValidOrder();
@@ -203,7 +232,8 @@ namespace OrderEntryMockingPracticeTests
             var placedOrderSummary = _orderService.PlaceOrder(order);
 
             //Act
-            placedOrderSummary.Taxes.ShouldNotBeNull();
+            placedOrderSummary.NetTotal.ShouldNotBeNull();
+            placedOrderSummary.NetTotal.ShouldNotBe(0m);
         }
     }
 }
