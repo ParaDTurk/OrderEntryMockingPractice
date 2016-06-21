@@ -218,7 +218,7 @@ namespace OrderEntryMockingPracticeTests
             var placedOrder = _orderService.PlaceOrder(order);
 
             //Act
-            _customerRepository.Received().Get(Arg.Any<int>());
+            _customerRepository.Received().Get(11);
             placedOrder.CustomerId.ShouldBe(11);
         }
 
@@ -232,6 +232,7 @@ namespace OrderEntryMockingPracticeTests
             var placedOrderSummary = _orderService.PlaceOrder(order);
 
             //Act
+            //todo return real numbers
             placedOrderSummary.NetTotal.ShouldNotBeNull();
             placedOrderSummary.NetTotal.ShouldNotBe(0m);
         }
