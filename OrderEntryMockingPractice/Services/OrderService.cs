@@ -29,7 +29,6 @@ namespace OrderEntryMockingPractice.Services
             ValidateOrder(order);
 
             var fulfilledOrder = _orderFulfillmentService.Fulfill(order);
-
             var customer = _customerRepository.Get(fulfilledOrder.CustomerId);
             
             OrderSummary orderSummary = new OrderSummary()
@@ -37,9 +36,11 @@ namespace OrderEntryMockingPractice.Services
                 OrderNumber = fulfilledOrder.OrderNumber,
                 OrderId = fulfilledOrder.OrderId,
                 CustomerId = fulfilledOrder.CustomerId,
-                Taxes = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country),
-                NetTotal = CalculateNetTotal(order)
+                Taxes = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country)
             };
+
+            orderSummary.NetTotal = order.CalculateNetTotal();
+            orderSummary.Total = order.CalculateOrderTotal(orderSummary.NetTotal, orderSummary.Taxes);
 
             return orderSummary;
         }
@@ -65,17 +66,6 @@ namespace OrderEntryMockingPractice.Services
         private bool SKUsAreUnique(Order order)
         {
             return order.OrderItems.Distinct().Count() == order.OrderItems.Count;
-        }
-
-        private decimal CalculateNetTotal(Order order)
-        {
-            decimal total = 0;
-            foreach (OrderItem orderItem in order.OrderItems)
-            {
-                total = orderItem.Quantity*orderItem.Product.Price;
-            }
-
-            return total;
         }
     }
 }

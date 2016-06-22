@@ -223,7 +223,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void PlacedOrderSummaryContainsNetTotal()
+        public void PlacedOrderSummaryContainsValidNetTotal()
         {
             //Arrange
             var order = CreateValidOrder();
@@ -232,9 +232,20 @@ namespace OrderEntryMockingPracticeTests
             var placedOrderSummary = _orderService.PlaceOrder(order);
 
             //Act
-            //todo return real numbers
-            placedOrderSummary.NetTotal.ShouldNotBeNull();
-            placedOrderSummary.NetTotal.ShouldNotBe(0m);
+            placedOrderSummary.NetTotal.ShouldBe(200m);
+        }
+
+        [Test]
+        public void PlacedOrderSummaryContainsValidOrderTotal()
+        {
+            //Arrange
+            var order = CreateValidOrder();
+
+            //Assert
+            var placedOrderSummary = _orderService.PlaceOrder(order);
+
+            //Act
+            placedOrderSummary.Total.ShouldBe(400m);
         }
     }
 }
