@@ -42,6 +42,8 @@ namespace OrderEntryMockingPractice.Services
             orderSummary.NetTotal = order.CalculateNetTotal();
             orderSummary.Total = order.CalculateOrderTotal(orderSummary.NetTotal, orderSummary.Taxes);
 
+            _emailService.SendOrderConfirmationEmail(orderSummary.CustomerId, orderSummary.OrderId);
+
             return orderSummary;
         }
 

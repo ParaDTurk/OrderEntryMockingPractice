@@ -99,7 +99,6 @@ namespace OrderEntryMockingPracticeTests
             order.OrderItems.Add(_orderItem1);
             order.OrderItems.Add(_orderItem2);
 
-            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
             _taxRateService.GetTaxEntries(Arg.Any<String>(), Arg.Any<String>()).Returns(new[] {_taxEntry});
             _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
             _productRepository.IsInStock(Arg.Any<String>()).Returns(true);
@@ -246,6 +245,19 @@ namespace OrderEntryMockingPracticeTests
 
             //Act
             placedOrderSummary.Total.ShouldBe(400m);
+        }
+
+        [Test]
+        public void PlacedOrderSubmitsCustomerEmail()
+        {
+            //Arrange
+            var order = CreateValidOrder();
+
+            //Assert
+            var placedOrderSummary = _orderService.PlaceOrder(order);
+
+            //Act
+            _emailService.Received().SendOrderConfirmationEmail(placedOrderSummary.CustomerId, placedOrderSummary.OrderId);
         }
     }
 }
