@@ -84,27 +84,6 @@ namespace OrderEntryMockingPracticeTests
                 },
                 Quantity = 1m
             };
-
-            
-        }
-
-        public Order CreateValidOrder()
-        {
-            var order = new Order
-            {
-                CustomerId = 11,
-                OrderItems = new List<OrderItem>()
-            };
-
-            order.OrderItems.Add(_orderItem1);
-            order.OrderItems.Add(_orderItem2);
-
-            _taxRateService.GetTaxEntries(Arg.Any<String>(), Arg.Any<String>()).Returns(new[] {_taxEntry});
-            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
-            _productRepository.IsInStock(Arg.Any<String>()).Returns(true);
-            _customerRepository.Get(Arg.Any<int>()).Returns(_customer);
-
-            return order;
         }
 
         public Order CreateOrder()
@@ -114,6 +93,21 @@ namespace OrderEntryMockingPracticeTests
                 CustomerId = 11,
                 OrderItems = new List<OrderItem>()
             };
+
+            return order;
+        }
+
+        public Order CreateValidOrder()
+        {
+            var order = CreateOrder();
+
+            order.OrderItems.Add(_orderItem1);
+            order.OrderItems.Add(_orderItem2);
+
+            _taxRateService.GetTaxEntries(Arg.Any<String>(), Arg.Any<String>()).Returns(new[] {_taxEntry});
+            _orderFulfillmentService.Fulfill(order).Returns(_orderConfirmation);
+            _productRepository.IsInStock(Arg.Any<String>()).Returns(true);
+            _customerRepository.Get(Arg.Any<int>()).Returns(_customer);
 
             return order;
         }
@@ -248,7 +242,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void PlacedOrderSubmitsCustomerEmail()
+        public void PlacedOrderSendsCustomerEmail()
         {
             //Arrange
             var order = CreateValidOrder();

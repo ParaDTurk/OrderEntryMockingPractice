@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using OrderEntryMockingPractice.Models;
 
 namespace OrderEntryMockingPractice.Services
@@ -39,8 +40,8 @@ namespace OrderEntryMockingPractice.Services
                 Taxes = _taxRateService.GetTaxEntries(customer.PostalCode, customer.Country)
             };
 
-            orderSummary.NetTotal = order.CalculateNetTotal();
-            orderSummary.Total = order.CalculateOrderTotal(orderSummary.NetTotal, orderSummary.Taxes);
+            orderSummary.NetTotal = CalculateNetTotal(order);
+            orderSummary.Total = CalculateOrderTotal(order, orderSummary.Taxes);
 
             _emailService.SendOrderConfirmationEmail(orderSummary.CustomerId, orderSummary.OrderId);
 
@@ -68,6 +69,27 @@ namespace OrderEntryMockingPractice.Services
         private bool SKUsAreUnique(Order order)
         {
             return order.OrderItems.Distinct().Count() == order.OrderItems.Count;
+        }
+
+        private decimal CalculateNetTotal(Order order)
+        {
+            decimal total = 0;
+            foreach (OrderItem orderItem in order.OrderItems)
+            {
+                total += orderItem.Quantity * orderItem.Product.Price;
+            }
+
+            return total;
+        }
+
+        private decimal CalculateOrderTotal(Order order, IEnumerable<TaxEntry> taxes)
+        {
+            decimal total = CalculateNetTotal(order);
+            foreach (TaxEntry taxEntry in taxes)
+            {
+                total += (taxEntry.Rate * total);
+            }
+            return total;
         }
     }
 }
